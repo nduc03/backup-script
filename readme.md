@@ -1,1 +1,1 @@
-Backup this useful script that automate my work
+Backup these useful scripts that automate my work
