@@ -1,10 +1,10 @@
 # Automatically unpack XAPK (the new format with multiple apks) then install apks to device.
 # not compatible with old xapk that use obb files.
 import sys
-import os
 import subprocess
 import zipfile
 import tempfile
+from pathlib import Path
 
 
 def check_adb_exists():
@@ -38,12 +38,12 @@ def check_device_connected():
 
 def main(argv=None):
     if len(argv) < 2:
-        print("Error: Please provide the path to the .xapk file.")
+        print("Syntax: install-xapk-bundle <path_to_xapk_file>")
         sys.exit(1)
 
-    xapk_file = sys.argv[1]
+    xapk_file = Path(sys.argv[1])
 
-    if not os.path.isfile(xapk_file):
+    if not xapk_file.is_file():
         print(f"Error: File '{xapk_file}' does not exist.")
         sys.exit(1)
 
@@ -61,25 +61,29 @@ def main(argv=None):
             print("Error: Failed to unpack the .xapk file (bad zip file).")
             sys.exit(1)
 
-        apk_files = [
-            os.path.join(temp_dir, f)
-            for f in os.listdir(temp_dir)
-            if os.path.isfile(os.path.join(temp_dir, f)) and f.endswith('.apk')
-        ]
+        temp_path = Path(temp_dir)
 
-        if apk_files:
+        apk_paths = list(temp_path.rglob("*.apk"))
+
+        apk_files = " ".join([apk_path.name for apk_path in apk_paths])
+
+        if apk_paths:
             print(f"Installing {apk_files} to device...")
 
-            try:
-                result = subprocess.run(
-                    ['adb', 'install-multiple'] + apk_files, shell=True, capture_output=True, check=True)
+            result = subprocess.run(
+                ['adb', 'install-multiple'] + apk_paths,
+                shell=True,
+                capture_output=True,
+                check=False,
+                text=True
+            )
 
-                if result.returncode == 0:
-                    print(result.stdout.decode())
-                else:
-                    print(result.stderr.decode())
-            except subprocess.CalledProcessError as e:
-                print(f"Error: Failed to install APKs. {e}")
+            if result.returncode == 0:
+                print(result.stdout)
+                input('pause...')
+            else:
+                print(result.stderr)
+                print("Error: Failed to install APKs.")
                 sys.exit(1)
         else:
             print("Error: No APK files found in the extracted .xapk package.")
