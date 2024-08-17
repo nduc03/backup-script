@@ -44,7 +44,7 @@ def main(argv=None):
     xapk_file = Path(sys.argv[1])
 
     if not xapk_file.is_file():
-        print(f"Error: File '{xapk_file}' does not exist.")
+        print(f"Error: File '{str(xapk_file)}' does not exist.")
         sys.exit(1)
 
     if not check_adb_exists():
@@ -80,7 +80,6 @@ def main(argv=None):
 
             if result.returncode == 0:
                 print(result.stdout)
-                input('pause...')
             else:
                 print(result.stderr)
                 print("Error: Failed to install APKs.")
