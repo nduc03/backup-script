@@ -127,7 +127,7 @@ echo -e "Hello \033[01;32m$(whoami)\033[00m!"
 
 upgradable_count=$(($(apt list --upgradable 2>/dev/null | wc -l) - 1))
 if [ $upgradable_count == 1 ]; then
-    echo -e "You have \033[0;32m$upgradable_count\033[0m upgradable package, run \033[0;32m\"sudo apt upgrade\"\033[0m to upgrade it."
+    echo -e "You have \033[0;32m$upgradable_count\033[0m upgradable package, run \033[0;32m\"sudo apt update && sudo apt upgrade\"\033[0m to upgrade it."
 elif [ $upgradable_count -gt 1 ]; then
-    echo -e "You have \033[0;32m$upgradable_count\033[0m upgradable package(s), run \033[0;32m\"sudo apt upgrade\"\033[0m to upgrade them all."
+    echo -e "You have \033[0;32m$upgradable_count\033[0m upgradable package(s), run \033[0;32m\"sudo apt update && sudo apt upgrade\"\033[0m to upgrade them all."
 fi
